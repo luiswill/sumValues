@@ -1,0 +1,66 @@
+<template id="sumValuesTemplate">
+    <p id="sum"></p>
+    <ul id="values">
+    </ul>
+</template>
+
+<script>
+
+    const doc = (document._currentScript || document.currentScript).ownerDocument;
+    const template = doc.querySelector('#sumValuesTemplate');
+
+    class SumValues extends HTMLElement {
+       constructor() {
+           super();
+
+           this.getAttributes();
+
+
+           this.appendComponentToDocument();
+       } 
+
+       appendComponentToDocument() {
+            const root = this.attachShadow({mode:'open'});
+            const temp = document.importNode(template.content, true);
+
+            root.appendChild(temp);
+       }
+
+       getAttributes() {
+           let values = (this.getAttribute('values')).split(',');
+
+           let DOMElements = [];
+
+           values.forEach((value) => {
+               DOMElements.push(this.getElement(value));
+           });
+
+           this.appendElementsToDom(DOMElements);
+           this.appendSumToDom(values);
+
+       }
+
+       appendSumToDom(values) {
+           let sum = values.reduce((acc, val) => parseInt(acc) + parseInt(val));
+
+           template.content.querySelector('#sum').innerHTML = 'Sum of values: ' + sum;
+       }
+
+       appendElementsToDom(elements) {
+           let valuesList = template.content.querySelector('#values');
+
+           elements.forEach((element) => {
+            valuesList.appendChild(element);
+           });
+       }
+
+       getElement(value) {
+           let element = document.createElement('li');
+           element.innerHTML = value;
+
+           return element;
+       }
+    }
+
+    customElements.define('sum-values', SumValues);
+</script>
